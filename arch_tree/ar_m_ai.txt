@@ -1,0 +1,1 @@
+sample architecture tree Flutter MVVM  with implemented riverpod, hooks_riverpod, flutter_riverpod, mmkv, dio, responsive screen and use repository layer

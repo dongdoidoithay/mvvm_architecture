@@ -1,0 +1,244 @@
+lib/
+├── data/
+│   ├── models/                     # Contains data models
+│   ├── repositories/               # Contains repository implementations
+│   └── providers/                  # Contains Riverpod providers for repositories
+├── services/
+│   ├── api_service.dart            # Contains API service implementation using Dio
+│   └── storage_service.dart        # Contains storage service implementation using MMKV
+├── ui/
+│   ├── screens/                    # Contains different screens/views
+│   │   ├── home/                   # Contains home screen implementation
+│   │   │   ├── home_view.dart      # Contains the view layer (UI) implementation using Flutter widgets
+│   │   │   ├── home_view_model.dart # Contains the view model layer (business logic) implementation using hooks_riverpod
+│   │   │   ├── home_state.dart     # Contains the state for the home screen
+│   │   │   └── home_providers.dart # Contains Riverpod providers for the home screen
+│   │   └── ...                     # Other screens
+│   └── shared/                     # Contains shared widgets/components
+│       ├── app_theme.dart          # Contains the app theme implementation using ultimate theme
+│       ├── responsive_builder.dart # Contains responsive builder implementation
+│       └── ...                     # Other shared widgets/components
+├── utils/
+│   ├── exceptions.dart             # Contains custom exceptions
+│   └── helpers.dart                # Contains utility/helper functions
+├── main.dart                       # Entry point of the app
+└── app_providers.dart              # Contains global Riverpod providers for the app
+In this architecture tree, the data folder contains the data models and repository implementations, while the services folder contains the API and storage service implementations.
+
+The ui folder contains the different screens/views of the app, with each screen having its own view and view model implementation, as well as its own state and Riverpod providers. The shared folder contains shared widgets/components used across multiple screens, such as the app theme and responsive builder.
+
+The utils folder contains custom exceptions and utility/helper functions used across the app, while main.dart serves as the entry point of the app. Finally, app_providers.dart contains global Riverpod providers used across the app, such as the provider for the app's theme.
+
+
+
+
+doc.khanhbui@gmail.com
+detail file code architecture tree above.
+Sure, I can provide a brief explanation and sample code for each file in the architecture tree above:
+
+lib/data/models/: This folder contains data models that represent the data entities used in the app. For example, a User model could represent the user data returned from the API.
+
+dart
+Copy code
+class User {
+  final int id;
+  final String name;
+  final String email;
+
+  User({
+    required this.id,
+    required this.name,
+    required this.email,
+  });
+}
+lib/data/repositories/: This folder contains repository implementations that handle data fetching and caching. For example, a UserRepository could fetch user data from the API and cache it locally using the StorageService.
+
+dart
+Copy code
+class UserRepository {
+  final ApiService _apiService;
+  final StorageService _storageService;
+
+  UserRepository({
+    required ApiService apiService,
+    required StorageService storageService,
+  }) : _apiService = apiService,
+       _storageService = storageService;
+
+  Future<List<User>> getUsers() async {
+    try {
+      final users = await _apiService.getUsers();
+      _storageService.saveUsers(users);
+      return users;
+    } catch (e) {
+      throw CustomException('Failed to get users: $e');
+    }
+  }
+
+  Future<User> getUserById(int id) async {
+    try {
+      final user = await _apiService.getUserById(id);
+      _storageService.saveUser(user);
+      return user;
+    } catch (e) {
+      throw CustomException('Failed to get user: $e');
+    }
+  }
+}
+lib/data/providers/: This folder contains Riverpod providers for the repositories. For example, a userRepositoryProvider could provide an instance of the UserRepository to other parts of the app.
+
+dart
+Copy code
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+  final storageService = ref.watch(storageServiceProvider);
+  return UserRepository(apiService: apiService, storageService: storageService);
+});
+lib/services/api_service.dart: This file contains the API service implementation using Dio. For example, a getUsers method could make a GET request to the /users endpoint and return a list of User models.
+
+dart
+Copy code
+class ApiService {
+  final Dio _dio = Dio();
+
+  Future<List<User>> getUsers() async {
+    try {
+      final response = await _dio.get('/users');
+      final users = (response.data as List<dynamic>)
+          .map((userJson) => User.fromJson(userJson))
+          .toList();
+      return users;
+    } catch (e) {
+      throw CustomException('Failed to get users: $e');
+    }
+  }
+
+  Future<User> getUserById(int id) async {
+    try {
+      final response = await _dio.get('/users/$id');
+      final user = User.fromJson(response.data);
+      return user;
+    } catch (e) {
+      throw CustomException('Failed to get user: $e');
+    }
+  }
+}
+lib/services/storage_service.dart: This file contains the storage service implementation using MMKV. For example, a saveUsers method could save a list of User models to local storage.
+
+dart
+Copy code
+class StorageService {
+  final MMKV _mmkv = MMKV.defaultInstance();
+
+  Future<void> saveUsers(List<User> users) async {
+    final usersJson = users.map((user) => user.toJson()).toList();
+    await _mmkv.setStringList('users', usersJson);
+  }
+
+  Future<List<User>> getUsers() async {
+    final usersJson = _mmkv.getStringList('users');
+    final users =
+
+
+
+doc.khanhbui@gmail.com
+continue above
+scss
+Copy code
+usersJson?.map((userJson) => User.fromJson(userJson)).toList() ?? [];
+return users;
+}
+
+Future<void> saveUser(User user) async {
+final userJson = user.toJson();
+await mmkv.setString('user${user.id}', userJson);
+}
+
+Future<User?> getUserById(int id) async {
+final userJson = mmkv.getString('user$id');
+if (userJson == null) return null;
+final user = User.fromJson(userJson);
+return user;
+}
+}
+
+less
+Copy code
+
+**`lib/presentation/`**: This folder contains the presentation layer files, including views and view models.
+
+**`lib/presentation/views/`**: This folder contains the views, which are responsible for displaying UI elements. For example, a `UserListView` could display a list of `User` models.
+
+```dart
+class UserListView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final users = context.watch(userListViewModelProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User List'),
+      ),
+      body: users.when(
+        loading: () => Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(child: Text('Error: $error')),
+        data: (users) => ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final user = users[index];
+            return ListTile(
+              title: Text(user.name),
+              subtitle: Text(user.email),
+              onTap: () => Navigator.pushNamed(context, '/users/${user.id}'),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+lib/presentation/view_models/: This folder contains the view models, which are responsible for providing data to the views. For example, a UserListViewModel could provide a list of User models to the UserListView.
+
+dart
+Copy code
+final userListViewModelProvider = FutureProvider<List<User>>((ref) async {
+  final userRepository = ref.watch(userRepositoryProvider);
+  final users = await userRepository.getUsers();
+  return users;
+});
+lib/utils/: This folder contains utility files that can be used throughout the app. For example, a constants.dart file could contain app-wide constants such as API endpoints and shared preferences keys.
+
+dart
+Copy code
+class Constants {
+  static const String apiBaseUrl = 'https://api.example.com';
+  static const String usersEndpoint = '$apiBaseUrl/users';
+  static const String userEndpoint = '$apiBaseUrl/users/:id';
+}
+lib/main.dart: This file contains the app's entry point and routes. For example, the /users route could display the UserListView, and the /users/:id route could display a UserDetailView.
+
+dart
+Copy code
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Flutter MVVM Sample',
+        theme: AppTheme.lightThemeData,
+        darkTheme: AppTheme.darkThemeData,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => UserListView(),
+          '/users/:id': (context) => UserDetailView(),
+        },
+      ),
+    );
+  }
+}
+
+

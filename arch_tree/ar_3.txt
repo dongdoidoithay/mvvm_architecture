@@ -1,0 +1,190 @@
+Here is a sample architecture tree for Flutter MVVM with implemented riverpod, hooks_riverpod, flutter_riverpod, mmkv, dio, responsive_builder, ultimate theme, and use repository layer:
+
+lua
+Copy code
+lib/
+|-- core/
+|   |-- data/
+|   |   |-- models/                     // Data models used in the app
+|   |   |-- repositories/               // Repository interfaces and implementations
+|   |   |-- services/                   // Service interfaces and implementations
+|   |   |-- utils/                      // Utility classes and functions
+|   |-- presentation/
+|   |   |-- constants/                  // Constants used in the app
+|   |   |-- controllers/                // Controllers for each screen or feature
+|   |   |-- screens/                    // Screens or features of the app
+|   |   |-- viewmodels/                 // View models for each screen or feature
+|-- app.dart                            // Main entry point of the app
+|-- main.dart                           // Entry point for the app in development mode
+|-- main_prod.dart                      // Entry point for the app in production mode
+|-- theme.dart                          // App-wide themes and styles
+Here is a brief explanation of each directory and file:
+
+core: This directory contains the core business logic of the app, divided into data and presentation subdirectories.
+
+data: This subdirectory contains the data layer of the app, which includes data models, repositories, services, and utility classes and functions. The models subdirectory contains the data models used in the app, the repositories subdirectory contains the repository interfaces and implementations, the services subdirectory contains the service interfaces and implementations, and the utils subdirectory contains utility classes and functions used throughout the data layer.
+presentation: This subdirectory contains the presentation layer of the app, which includes controllers, screens, and view models. The controllers subdirectory contains controllers for each screen or feature of the app, the screens subdirectory contains the screens or features of the app, and the viewmodels subdirectory contains the view models for each screen or feature of the app.
+app.dart: This file is the main entry point of the app, which initializes the app and sets up the necessary dependencies.
+
+main.dart: This file is the entry point for the app in development mode, which sets up the necessary configurations for running the app in development mode.
+
+main_prod.dart: This file is the entry point for the app in production mode, which sets up the necessary configurations for running the app in production mode.
+
+theme.dart: This file contains the app-wide themes and styles used throughout the app.
+
+Here are some additional explanations of the packages used in this architecture:
+
+riverpod: A state management library for Flutter, which provides a way to manage application state using providers.
+
+hooks_riverpod: A collection of hooks for Flutter, which allows you to use Riverpod providers with hooks.
+
+flutter_riverpod: A Flutter package that provides an integration between Flutter and Riverpod.
+
+mmkv: A lightweight key-value storage library for Flutter, which provides a way to persist data in the app.
+
+dio: A powerful HTTP client for Dart, which provides a way to make HTTP requests in the app.
+
+responsive_builder: A Flutter package that provides a way to build responsive layouts in the app.
+
+ultimate theme: A Flutter package that provides a way to easily switch between light and dark themes in the app.
+
+use repository layer: A pattern that separates the data layer from the presentation layer, which allows for better organization and easier maintenance of the app.
+
+
+
+
+doc.khanhbui@gmail.com
+detail code above
+Unfortunately, I cannot provide the entire code for the architecture tree as it would be too lengthy and complex. However, I can provide some sample code snippets for each directory and file to help illustrate how the architecture works.
+
+Here is some sample code for the models subdirectory:
+
+dart
+Copy code
+// lib/core/data/models/user.dart
+
+class User {
+  final int id;
+  final String name;
+  final String email;
+
+  User({required this.id, required this.name, required this.email});
+}
+Here is some sample code for the repositories subdirectory:
+
+dart
+Copy code
+// lib/core/data/repositories/user_repository.dart
+
+import 'package:my_app/core/data/models/user.dart';
+
+abstract class UserRepository {
+  Future<User?> getUserById(int id);
+}
+
+class UserRepositoryImpl implements UserRepository {
+  @override
+  Future<User?> getUserById(int id) async {
+    // implementation of fetching user by id from API or local storage
+  }
+}
+Here is some sample code for the services subdirectory:
+
+dart
+Copy code
+// lib/core/data/services/api_service.dart
+
+import 'package:dio/dio.dart';
+import 'package:my_app/core/data/models/user.dart';
+
+class ApiService {
+  final Dio _dio;
+
+  ApiService(this._dio);
+
+  Future<User?> getUserById(int id) async {
+    final response = await _dio.get('/users/$id');
+    if (response.statusCode == 200) {
+      return User(
+        id: response.data['id'],
+        name: response.data['name'],
+        email: response.data['email'],
+      );
+    } else {
+      return null;
+    }
+  }
+}
+Here is some sample code for the viewmodels subdirectory:
+
+dart
+Copy code
+// lib/core/presentation/viewmodels/user_viewmodel.dart
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/data/models/user.dart';
+import 'package:my_app/core/data/repositories/user_repository.dart';
+
+final userViewModelProvider =
+    StateNotifierProvider.autoDispose<UserViewModel, AsyncValue<User?>>((ref) {
+  final userRepository = ref.watch(userRepositoryProvider);
+  return UserViewModel(userRepository);
+});
+
+class UserViewModel extends StateNotifier<AsyncValue<User?>> {
+  final UserRepository _userRepository;
+
+  UserViewModel(this._userRepository) : super(const AsyncValue.loading()) {
+    getUserById(1);
+  }
+
+  Future<void> getUserById(int id) async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await _userRepository.getUserById(id);
+      state = AsyncValue.data(user);
+    } catch (e) {
+      state = AsyncValue.error(e);
+    }
+  }
+}
+Here is some sample code for the screens subdirectory:
+
+dart
+Copy code
+// lib/core/presentation/screens/user_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/presentation/viewmodels/user_viewmodel.dart';
+
+class UserScreen extends StatelessWidget {
+  const UserScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('User Screen'),
+      ),
+      body: Center(
+        child: Consumer(
+          builder: (context, watch, child) {
+            final userViewModel = watch(userViewModelProvider);
+            return userViewModel.when(
+              data: (user) => Text('User: ${user?.name ?? ''}'),
+              loading: () => const CircularProgressIndicator(),
+              error: (error, stackTrace) =>
+                  Text('An error occurred: $error'),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+Finally, here is some sample code
+
+
+
+

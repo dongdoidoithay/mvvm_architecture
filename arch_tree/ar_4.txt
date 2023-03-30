@@ -1,0 +1,360 @@
+|- lib/
+  |- main.dart
+  |- core/
+    |- models/
+      |- user.dart
+    |- services/
+      |- api_service.dart
+    |- repositories/
+      |- user_repository.dart
+    |- constants/
+      |- app_constants.dart
+    |- themes/
+      |- light_theme.dart
+      |- dark_theme.dart
+    |- utils/
+      |- size_config.dart
+  |- views/
+    |- home/
+      |- home_view.dart
+      |- home_viewmodel.dart
+      |- home_screen.dart
+    |- login/
+      |- login_view.dart
+      |- login_viewmodel.dart
+      |- login_screen.dart
+  |- widgets/
+    |- custom_button.dart
+    |- custom_textfield.dart
+    |- responsive_container.dart
+  |- providers/
+    |- user_provider.dart
+    |- theme_provider.dart
+  |- hooks/
+    |- use_login.dart
+  |- utils/
+    |- http_client.dart
+    |- mmkv_helper.dart
+
+[desc]
+Let's break it down:
+
+main.dart: This is the entry point of the app, which initializes the MaterialApp widget and the providers using the Riverpod package.
+
+core: This folder contains the core business logic of the app.
+
+models: This folder contains the data models used throughout the app. In this case, we have a User model.
+
+services: This folder contains the API service used to make network calls using the dio package.
+
+repositories: This folder contains the repository class responsible for fetching and storing data. In this case, we have a UserRepository class.
+
+constants: This folder contains the constant values used throughout the app. In this case, we have an AppConstants class.
+
+themes: This folder contains the theme data for the app. In this case, we have a LightTheme and a DarkTheme class.
+
+utils: This folder contains various utility classes used throughout the app. In this case, we have a SizeConfig class for responsive screen design.
+
+views: This folder contains the UI for the app.
+
+home: This folder contains the UI components for the home screen, including the HomeView, HomeViewModel, and HomeScreen classes.
+
+login: This folder contains the UI components for the login screen, including the LoginView, LoginViewModel, and LoginScreen classes.
+
+widgets: This folder contains the custom UI widgets used throughout the app. In this case, we have a CustomButton, CustomTextField, and ResponsiveContainer.
+
+providers: This folder contains the provider classes used throughout the app. In this case, we have a UserProvider and ThemeProvider.
+
+hooks: This folder contains the custom hooks used throughout the app. In this case, we have a useLogin hook.
+
+utils: This folder contains utility classes used throughout the app. In this case, we have an HttpClient class for making HTTP requests and an MmkvHelper class for using the mmkv package for local storage.
+[detail]
+
+Unfortunately, I cannot provide a complete implementation of the architecture as it would be too lengthy and would require a specific app to be developed. However, I can provide some example code snippets for each component of the architecture.
+
+main.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/constants/app_constants.dart';
+import 'package:my_app/core/themes/light_theme.dart';
+import 'package:my_app/core/themes/dark_theme.dart';
+import 'package:my_app/providers/theme_provider.dart';
+
+void main() {
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, ScopedReader watch) {
+    final themeMode = watch(themeProvider);
+    return MaterialApp(
+      title: 'My App',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppConstants.homeRoute,
+      onGenerateRoute: Router.generateRoute,
+    );
+  }
+}
+models/user.dart
+dart
+Copy code
+class User {
+  final String id;
+  final String email;
+  final String name;
+
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      email: json['email'],
+      name: json['name'],
+    );
+  }
+}
+services/api_service.dart
+dart
+Copy code
+import 'package:dio/dio.dart';
+
+class ApiService {
+  final Dio _dio = Dio();
+
+  Future<dynamic> getData(String endpoint) async {
+    try {
+      final response = await _dio.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw Exception(error);
+    }
+  }
+}
+repositories/user_repository.dart
+dart
+Copy code
+import 'package:my_app/core/models/user.dart';
+import 'package:my_app/core/services/api_service.dart';
+
+class UserRepository {
+  final ApiService _apiService = ApiService();
+
+  Future<User> getUser(String userId) async {
+    final result = await _apiService.getData('/users/$userId');
+    return User.fromJson(result);
+  }
+}
+constants/app_constants.dart
+dart
+Copy code
+class AppConstants {
+  static const String homeRoute = '/';
+  static const String loginRoute = '/login';
+}
+themes/light_theme.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+
+final ThemeData lightTheme = ThemeData(
+  primaryColor: Colors.blue,
+  accentColor: Colors.blueAccent,
+  fontFamily: 'Montserrat',
+);
+themes/dark_theme.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+
+final ThemeData darkTheme = ThemeData(
+  primaryColor: Colors.blueGrey,
+  accentColor: Colors.blueAccent,
+  fontFamily: 'Montserrat',
+  brightness: Brightness.dark,
+);
+utils/size_config.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+
+class SizeConfig {
+  static late MediaQueryData _mediaQueryData;
+  static late double screenWidth;
+  static late double screenHeight;
+  static late double blockSizeHorizontal;
+  static late double blockSizeVertical;
+
+  static late double _safeAreaHorizontal;
+  static late double _safeAreaVertical;
+  static late double safeBlockHorizontal;
+  static late double safeBlockVertical;
+
+  void init(BuildContext context) {
+    _mediaQueryData = MediaQuery.of(context);
+    screenWidth = _mediaQueryData.size.width;
+    screenHeight = _mediaQueryData.size.height;
+    blockSizeHorizontal = screenWidth / 
+
+
+
+doc.khanhbui@gmail.com
+contineu utils/size_config.dart
+100;
+blockSizeVertical = screenHeight / 100;
+
+makefile
+Copy code
+_safeAreaHorizontal =
+    _mediaQueryData.padding.left + _mediaQueryData.padding.right;
+_safeAreaVertical =
+    _mediaQueryData.padding.top + _mediaQueryData.padding.bottom;
+safeBlockHorizontal = (screenWidth -
+        _safeAreaHorizontal) /
+    100;
+safeBlockVertical = (screenHeight -
+        _safeAreaVertical) /
+    100;
+}
+}
+
+kotlin
+Copy code
+
+9. `providers/user_provider.dart`
+
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/models/user.dart';
+import 'package:my_app/repositories/user_repository.dart';
+
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  return UserRepository();
+});
+
+final userProvider = FutureProvider.family<User, String>((ref, userId) async {
+  final userRepository = ref.read(userRepositoryProvider);
+  return userRepository.getUser(userId);
+});
+views/home_view.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/providers/user_provider.dart';
+import 'package:my_app/utils/size_config.dart';
+
+class HomeView extends HookWidget {
+  final String userId;
+
+  const HomeView({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final userAsyncValue = useProvider(userProvider(userId));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+      ),
+      body: userAsyncValue.when(
+        data: (user) => Center(
+          child: Text('Hello, ${user.name}!'),
+        ),
+        loading: () => Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Text('Error: $error'),
+        ),
+      ),
+    );
+  }
+}
+router.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:my_app/constants/app_constants.dart';
+import 'package:my_app/views/home_view.dart';
+import 'package:my_app/views/login_view.dart';
+
+class Router {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppConstants.homeRoute:
+        final userId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => HomeView(
+            userId: userId,
+          ),
+        );
+      case AppConstants.loginRoute:
+        return MaterialPageRoute(builder: (_) => LoginView());
+      default:
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text('No route defined for ${settings.name}'),
+            ),
+          ),
+        );
+    }
+  }
+}
+
+
+
+doc.khanhbui@gmail.com
+contineu
+main.dart
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/constants/app_constants.dart';
+import 'package:my_app/providers/theme_provider.dart';
+import 'package:my_app/router.dart';
+import 'package:my_app/views/login_view.dart';
+
+void main() {
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final themeMode = context.read(themeProvider);
+
+    return MaterialApp(
+      title: 'My App',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: themeMode,
+      initialRoute: AppConstants.loginRoute,
+      onGenerateRoute: Router.generateRoute,
+      home: LoginView(),
+    );
+  }
+}

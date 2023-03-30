@@ -1,0 +1,55 @@
+- lib
+  - data
+    - models
+      - user.dart
+    - repositories
+      - user_repository.dart
+  - screens
+    - home
+      - home_screen.dart
+      - home_screen_view_model.dart
+  - services
+    - dio_service.dart
+    - mmkv_service.dart
+  - utils
+    - constants.dart
+  - widgets
+    - tablet
+      - home_screen_tablet.dart
+    - mobile
+      - home_screen_mobile.dart
+  - app_theme.dart
+  - main.dart
+
+[DESC]
+In this architecture, we have separated our code into different layers:
+
+data: Contains our data models and repository classes.
+screens: Contains our app screens and view models.
+services: Contains our services for making network requests and storing data locally.
+utils: Contains constants and other utility classes.
+widgets: Contains our widgets for different screen sizes.
+We also have an app_theme.dart file that defines our app theme.
+
+Here's a brief overview of each layer:
+data
+This layer contains our data models and repository classes. The repository classes are responsible for retrieving and storing data. They act as a middleman between the data source and the view models.
+
+screens
+This layer contains our app screens and view models. Each screen has a corresponding view model that is responsible for managing the state of the screen. The view models use the repository classes to retrieve and store data.
+
+services
+This layer contains our services for making network requests and storing data locally. We're using dio for network requests and mmkv for local storage in this example.
+
+utils
+This layer contains constants and other utility classes that are used throughout the app.
+
+widgets
+This layer contains our widgets for different screen sizes. We have a separate widget for tablet and mobile layouts. We're using the LayoutBuilder widget to determine the screen size and display the appropriate widget.
+
+app_theme.dart
+This file defines our app theme, including colors, fonts, and other styles.
+
+main.dart
+This file is the entry point of our app. It sets up riverpod and initializes our app theme. It also sets up our HomeScreen widget as the initial screen of the app.
+

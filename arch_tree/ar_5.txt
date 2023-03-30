@@ -1,0 +1,324 @@
+lib/
+├── main.dart
+├── models/
+│   ├── user_model.dart
+│   └── ...
+├── repositories/
+│   ├── user_repository.dart
+│   └── ...
+├── services/
+│   ├── api_service.dart
+│   ├── mmkv_service.dart
+│   └── ...
+├── viewmodels/
+│   ├── home_viewmodel.dart
+│   ├── user_viewmodel.dart
+│   └── ...
+├── views/
+│   ├── home_view.dart
+│   ├── user_view.dart
+│   └── ...
+├── widgets/
+│   ├── custom_button.dart
+│   ├── custom_textfield.dart
+│   └── ...
+├── constants/
+│   ├── app_constants.dart
+│   ├── color_constants.dart
+│   └── ...
+├── utils/
+│   ├── response.dart
+│   ├── screen_utils.dart
+│   └── ...
+└── themes/
+    ├── app_theme.dart
+    ├── dark_theme.dart
+    └── light_theme.dart
+Explanation of the folders and files:
+
+main.dart: The entry point of the application.
+
+models: Contains data models used throughout the application.
+
+repositories: Contains repository classes that handle data fetching and storage.
+
+services: Contains service classes that handle communication with APIs and local storage.
+
+viewmodels: Contains view model classes that handle data manipulation and interaction between views and repositories.
+
+views: Contains view classes that display UI and interact with user input.
+
+widgets: Contains reusable widget classes that can be used across views.
+
+constants: Contains constant values used throughout the application, such as app-wide constants and color constants.
+
+utils: Contains utility classes and functions that assist with common tasks, such as handling API responses and screen size detection.
+
+themes: Contains theme classes that define the visual style of the application, including a base theme, a light theme, and a dark theme.
+
+This architecture uses the MVVM (Model-View-ViewModel) pattern, which separates the presentation logic (view) from the business logic (view model) and data (model). Riverpod, hooks_riverpod, and flutter_riverpod are used for dependency injection and state management. MMKV is used for local data storage. Dio is used for API communication. Multi-theme support is implemented to allow users to switch between light and dark themes. Responsive screen is used to adjust the UI based on screen size. The repository layer is used to abstract away data fetching and storage from the view model.
+
+
+
+
+doc.khanhbui@gmail.com
+detail code above
+Sure, here's an example of how the code in each folder might look like:
+
+models/user_model.dart:
+
+dart
+Copy code
+class UserModel {
+  final String id;
+  final String name;
+  final String email;
+  
+  UserModel({
+    required this.id,
+    required this.name,
+    required this.email,
+  });
+}
+repositories/user_repository.dart:
+
+dart
+Copy code
+import 'package:dio/dio.dart';
+import '../models/user_model.dart';
+import '../services/api_service.dart';
+
+class UserRepository {
+  final ApiService _apiService;
+  
+  UserRepository(this._apiService);
+  
+  Future<List<UserModel>> getUsers() async {
+    try {
+      final response = await _apiService.get('users');
+      if (response.statusCode == 200) {
+        final data = response.data as List<dynamic>;
+        final users = data.map((user) => UserModel(
+          id: user['id'].toString(),
+          name: user['name'].toString(),
+          email: user['email'].toString(),
+        )).toList();
+        return users;
+      }
+      return [];
+    } on DioError catch (e) {
+      // handle error
+      return [];
+    }
+  }
+}
+services/api_service.dart:
+
+dart
+Copy code
+import 'package:dio/dio.dart';
+
+class ApiService {
+  final Dio _dio = Dio();
+  final String baseUrl = 'https://jsonplaceholder.typicode.com/';
+
+  Future<Response<dynamic>> get(String path) async {
+    try {
+      final response = await _dio.get(baseUrl + path);
+      return response;
+    } on DioError catch (e) {
+      // handle error
+      throw e;
+    }
+  }
+}
+viewmodels/user_viewmodel.dart:
+
+dart
+Copy code
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/user_model.dart';
+import '../repositories/user_repository.dart';
+
+final userViewModelProvider = StateNotifierProvider<UserViewModel>((ref) {
+  final userRepository = ref.watch(userRepositoryProvider);
+  return UserViewModel(userRepository);
+});
+
+class UserViewModel extends StateNotifier<List<UserModel>> {
+  final UserRepository _userRepository;
+  
+  UserViewModel(this._userRepository) : super([]);
+
+  Future<void> getUsers() async {
+    state = await _userRepository.getUsers();
+  }
+}
+views/user_view.dart:
+
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../viewmodels/user_viewmodel.dart';
+
+class UserView extends ConsumerWidget {
+  const UserView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userViewModel = ref.watch(userViewModelProvider.notifier);
+    final users = ref.watch(userViewModelProvider);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Users'),
+      ),
+      body: users.isEmpty 
+        ? Center(child: CircularProgressIndicator())
+        : ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (context, index) => ListTile(
+            title: Text(users[index].name),
+            subtitle: Text(users[index].email),
+          ),
+        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => userViewModel.getUsers(),
+        child: Icon(Icons.refresh),
+      ),
+    );
+  }
+}
+constants/color_constants.dart:
+
+dart
+Copy code
+import 'package:flutter/material.dart';
+
+class ColorConstants {
+  static const Color primaryColor = Color(0xFF6200EE);
+  static const Color accentColor = Color(0xFF03DAC6);
+  static const Color textColor = Color(0xFF333333);
+  static const Color backgroundColor = Color(0xFFF5F5F5);
+}
+**`themes/app_theme.dart
+
+
+
+
+doc.khanhbui@gmail.com
+contineu
+themes/app_theme.dart:
+
+dart
+Copy code
+import 'package:flutter/material.dart';
+import '../constants/color_constants.dart';
+
+class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    primaryColor: ColorConstants.primaryColor,
+    accentColor: ColorConstants.accentColor,
+    scaffoldBackgroundColor: ColorConstants.backgroundColor,
+    textTheme: TextTheme(
+      bodyText2: TextStyle(color: ColorConstants.textColor),
+    ),
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: ColorConstants.primaryColor,
+    accentColor: ColorConstants.accentColor,
+    scaffoldBackgroundColor: Colors.black,
+    textTheme: TextTheme(
+      bodyText2: TextStyle(color: Colors.white),
+    ),
+  );
+}
+main.dart:
+
+dart
+Copy code
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mmkv_flutter/mmkv_flutter.dart';
+import './themes/app_theme.dart';
+import './views/user_view.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MmkvFlutter.init();
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+class MyApp extends ConsumerWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
+    return MaterialApp(
+      title: 'Flutter MVVM Demo',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode.state,
+      home: const UserView(),
+    );
+  }
+}
+
+final themeModeProvider = StateProvider<ThemeMode>((ref) {
+  final mmkv = MmkvFlutter.getInstance();
+  final int? value = mmkv.getInt('theme_mode');
+  return value != null ? ThemeMode.values[value] : ThemeMode.system;
+});
+
+final responsiveScreenProvider = Provider<ResponsiveScreen>((ref) {
+  final mediaQuery = MediaQuery.of(ref.watch(navigatorKeyProvider).currentContext!);
+  return ResponsiveScreen(mediaQuery.size.width, mediaQuery.size.height);
+});
+
+final navigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) => GlobalKey<NavigatorState>());
+
+class ResponsiveScreen {
+  final double width;
+  final double height;
+
+  const ResponsiveScreen(this.width, this.height);
+
+  double widthPercent(double percent) {
+    return width * percent / 100;
+  }
+
+  double heightPercent(double percent) {
+    return height * percent / 100;
+  }
+
+  double aspectRatio(double ratio) {
+    return width / ratio;
+  }
+}
+hooks/user_hooks.dart:
+
+dart
+Copy code
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../viewmodels/user_viewmodel.dart';
+
+final userViewModelHook = Provider.autoDispose<UserViewModel>((ref) {
+  final userRepository = ref.watch(userRepositoryProvider);
+  return UserViewModel(userRepository);
+});
+
+final userProviderHook = Provider.autoDispose<List<UserModel>>((ref) {
+  final userViewModel = ref.watch(userViewModelHook);
+  return userViewModel.state;
+});
+
+final getUsersHook = FutureProvider.autoDispose<void>((ref) {
+  final userViewModel = ref.watch(userViewModelHook.notifier);
+  return userViewModel.getUsers();
+});
+That's just an example of how the code might be organized. Depending on the specific needs of your project, the architecture and organization of the code may vary.

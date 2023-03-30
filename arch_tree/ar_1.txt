@@ -1,0 +1,60 @@
+├── lib
+│   ├── data
+│   │   ├── models        // Contains the data models
+│   │   ├── providers     // Contains the Riverpod providers for data
+│   │   └── repositories  // Contains the repository layer for data access
+│   ├── presentation
+│   │   ├── screens       // Contains the views/screens
+│   │   ├── viewmodels    // Contains the view models
+│   │   ├── widgets       // Contains the reusable widgets
+│   │   └── utils         // Contains utility classes
+│   ├── services
+│   │   ├── api           // Contains the DIO API client and models
+│   │   └── storage       // Contains the MMKV storage client
+│   ├── themes            // Contains the app themes using Ultimate Theme
+│   ├── app.dart          // Contains the main app widget
+│   └── main.dart         // Entry point for the app
+In this architecture, we have separated the code into different layers: data, presentation, and services.
+
+The data layer contains the data models, repository layer for data access, and Riverpod providers for data. The repository layer abstracts away the implementation details of how the data is retrieved and provides an interface for the view models to access the data. The Riverpod providers are used to expose the repository layer to the rest of the app and handle the state management of the data.
+
+The presentation layer contains the views/screens, view models, reusable widgets, and utility classes. The views/screens are responsible for displaying the UI to the user and interact with the view models to get data. The view models handle the business logic of the app and interact with the repository layer to get data. The reusable widgets are used across different screens/views to avoid code duplication. The utility classes are used for common functionalities like formatting dates, strings, etc.
+
+The services layer contains the API client and models using DIO for making HTTP requests, and the storage client using MMKV for storing key-value pairs on the device.
+
+Lastly, the themes folder contains the app themes using Ultimate Theme, which is a library that helps in managing app themes and provides easy customization options.
+
+Overall, this architecture provides a clean separation of concerns and makes the code easier to manage and maintain.
+
+presentation/
+├── screens/
+│   ├── home/
+│   │   ├── home_view.dart
+│   │   ├── home_viewmodel.dart
+│   │   └── widgets/
+│   │       ├── user_card.dart
+│   │       └── user_list.dart
+│   ├── login/
+│   │   ├── login_view.dart
+│   │   ├── login_viewmodel.dart
+│   │   └── widgets/
+│   │       └── login_form.dart
+│   ├── profile/
+│   │   ├── profile_view.dart
+│   │   ├── profile_viewmodel.dart
+│   │   └── widgets/
+│   │       ├── profile_header.dart
+│   │       └── profile_form.dart
+│   └── splash/
+│       ├── splash_view.dart
+│       └── splash_viewmodel.dart
+└── shared/
+    ├── widgets/
+    │   ├── app_bar.dart
+    │   ├── loading_spinner.dart
+    │   ├── snackbar.dart
+    │   └── theme_switch.dart
+    └── app_theme.dart
+
+
+
