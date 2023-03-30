@@ -11,6 +11,11 @@ final homeScreenViewModelProvider =
   final userRepository = ref.watch(userRepositoryProvider);
   return HomeScreenViewModel(userRepository: userRepository);
 });
+final userListProvider = FutureProvider<List<User>>((ref) async {
+  final userRepository = ref.watch(userRepositoryProvider);
+  final users = await userRepository.getUsers();
+  return users;
+});
 
 class HomeScreenViewModel extends ChangeNotifier {
   final UserRepository userRepository;

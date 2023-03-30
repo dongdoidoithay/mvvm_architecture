@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../screens/home/home_screen_view_model.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import '../../home_screen_view_model.dart';
 import '../user_list.dart';
 
-class HomeScreenMobile extends ConsumerWidget {
+class HomeScreenTablet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeScreenViewModel = ref.watch(homeScreenViewModelProvider);
-    homeScreenViewModel.getUsers();
     final userList = homeScreenViewModel.users;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My App Mobile'),
+        title: Text('My App'),
       ),
       body: Row(
         children: [
