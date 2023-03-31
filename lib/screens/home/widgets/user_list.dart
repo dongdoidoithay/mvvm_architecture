@@ -13,7 +13,7 @@ class UserList extends StatelessWidget {
       itemCount: users.length,
       itemBuilder: (BuildContext context, int index) {
         final user = users[index];
-        debugPrint('user: $user');
+        print('user: $user');
         return ListTile(
           leading: CircleAvatar(
             child: Text(user.name.substring(0, 1)),
